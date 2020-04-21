@@ -78,23 +78,33 @@ class CPU:
         PRN = 0b01000111
         HLT = 0b00000001
 
-        inst = self.ram_read(self.pc)
+
 
         while running:
+
+            inst = self.ram_read(self.pc)
 
             if inst == LDI:
                 # store value in register
                 operand_a = self.ram_read(self.pc + 1)
                 operand_b = self.ram_read(self.pc + 2)
 
-                self.ram_write(operand_a,operand_b)
+                # print(operand_a, operand_b)
+                self.reg[operand_a] = operand_b
+                # self.ram_write(operand_a,operand_b)
                 self.pc += 3
 
             elif inst == PRN:
                 # print value in register
-                print(self.ram_read(self.pc+1))
+                print(self.reg[self.ram_read(self.pc+1)])
                 self.pc += 2
 
             elif inst == HLT:
                 # halt CPU and exit
                 running = False
+
+
+# cpu = CPU()
+#
+# cpu.load()
+# cpu.run()
