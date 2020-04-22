@@ -10,6 +10,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
+        self.sp = 7
 
     def ram_read(self, add):
         """ Accept address to read and return valued stored """
@@ -107,6 +108,8 @@ class CPU:
         HLT = 0b00000001
 
         MUL = 0b10100010
+        PUSH = 0b01000101
+        POP = 0b01000110
 
         while running:
 
@@ -132,8 +135,28 @@ class CPU:
                 print(self.reg[self.ram_read(self.pc+1)])
                 self.pc += 2
 
+            elif inst == PUSH:
+                reg = self.ram[self.pc + 1]
+                val = self.reg[reg]
+                self.reg[self.sp] -= 1
+                self.ram[self.reg[self.sp]] = val
+                self.pc += 2
+
+            elif inst == POP:
+                reg = self.ram[self.pc+1]
+                val = self.ram[self.reg[self.sp]]
+                self.reg[reg] = val
+                self.reg[self.sp] += 1
+                self.pc += 2
+
             elif inst == HLT:
                 # halt CPU and exit
+                print(self.reg)
+                print(self.ram)
+                running = False
+
+            else:
+                print("Unknown instruction")
                 running = False
 
 
