@@ -61,7 +61,7 @@ class CPU:
                     self.ram[address] = val
                     address += 1
 
-            print("done loading")
+            # print("done loading")
         except FileNotFoundError:
             print("File not found")
             sys.exit(2)
@@ -108,8 +108,11 @@ class CPU:
         HLT = 0b00000001
 
         MUL = 0b10100010
+        ADD = 0b10100000
         PUSH = 0b01000101
         POP = 0b01000110
+        CALL = 0b01010000
+        RET = 0b00010001
 
         while running:
 
@@ -125,10 +128,30 @@ class CPU:
                 # self.ram_write(operand_a,operand_b)
                 self.pc += 3
 
+            elif inst == CALL:
+                return_addr = self.pc + 2
+
+                self.reg[self.sp] -= 1
+                self.ram[self.reg[self.sp]] = return_addr
+
+                reg_num = self.ram[self.pc + 1]
+                dest_addr = self.reg[reg_num]
+                self.pc = dest_addr
+
+            elif inst == RET:
+                return_addr = self.ram[self.reg[self.sp]]
+                self.reg[self.sp] += 1
+
+                self.pc = return_addr
+
             elif inst == MUL:
                 # print the product of 2 values
                 self.alu("MUL", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
                 self.pc += 3
+
+            elif inst == ADD:
+                self.alu("ADD", self.ram_read(self.pc+1), self.ram_read(self.pc+2))
+                self.pc +=3
 
             elif inst == PRN:
                 # print value in register
@@ -151,8 +174,8 @@ class CPU:
 
             elif inst == HLT:
                 # halt CPU and exit
-                print(self.reg)
-                print(self.ram)
+                # print(self.reg)
+                # print(self.ram)
                 running = False
 
             else:
